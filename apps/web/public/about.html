@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Суть игры — Арена прогнозов</title>
+    <style>
+      :root {
+        color: #e9e9ea;
+        background-color: #0a0a0b;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: radial-gradient(circle at 20% 10%, #141417 0%, #0a0a0b 40%),
+          radial-gradient(circle at 80% 90%, #121214 0%, transparent 50%),
+          #0a0a0b;
+        color: #e9e9ea;
+      }
+      .wrap {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 28px 20px 48px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        padding: 20px;
+        margin-top: 16px;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 0 0 8px;
+      }
+      h2 {
+        font-size: 16px;
+        margin: 18px 0 8px;
+      }
+      p, li {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #cbd5e1;
+      }
+      a {
+        color: #8bd5ff;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        font-size: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        padding: 2px 6px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <a href="/" style="color:#7dd3fc;text-decoration:none;">← Назад</a>
+        <span style="font-size:12px;color:#9ca3af;">Суть игры</span>
+      </div>
+      <h1>Суть игры</h1>
+      <p>«Арена прогнозов» — это игра на интуицию большинства. В каждом раунде появляется вопрос с вариантами ответов. Побеждает не тот, кто угадал «правду», а тот, кто выбрал вариант, который выбрало большинство игроков.</p>
+
+      <div class="card">
+        <h2>Как проходит матч</h2>
+        <ul>
+          <li>Вы заходите в матч с выбранной ставкой.</li>
+          <li>Игра начинается раундами. В каждом раунде нужно выбрать один вариант ответа.</li>
+          <li>После таймера показывается, какой вариант был в большинстве.</li>
+          <li>Те, кто выбрал меньшинство или не проголосовал — выбывают.</li>
+          <li>Матч продолжается до одного победителя.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Если осталось 2 игрока (финал 1 на 1)</h2>
+        <p>Система выбирает случайный «контрольный» вариант из доступных ответов. Затем сравнивает его с выбором двух игроков.</p>
+        <ul>
+          <li>Если только один игрок выбрал этот вариант — он побеждает.</li>
+          <li>Если оба выбрали этот вариант — победитель выбирается случайно из них двоих.</li>
+          <li>Если никто не выбрал этот вариант — победитель выбирается случайно из двух игроков.</li>
+        </ul>
+        <p>Это исключает ничью и гарантирует, что матч завершится победителем.</p>
+        <p>
+          Логика определения победителя: 
+          <a href="https://github.com/lovlygod/TONPredictionArenaTwoPlayerLogic/blob/main/apps/server/src/two-player.ts" target="_blank" rel="noopener noreferrer">
+            GitHub → two-player.ts
+          </a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

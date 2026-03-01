@@ -1,0 +1,12 @@
+﻿{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@arena/shared": ["../../packages/shared/src/index.ts"]
+    }
+  },
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }]
+}

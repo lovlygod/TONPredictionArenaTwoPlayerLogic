@@ -1,0 +1,206 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  tgUserId    String   @id
+  username    String?
+  firstName   String
+  avatarUrl   String?
+  refCode     String?  @unique
+  invitedByTgUserId String?
+  createdAt   DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+  sessions    Session[]
+  balance     Balance?
+  queueEntries QueueEntry[]
+  matchPlayers MatchPlayer[]
+  votes       Vote[]
+  deposits    Deposit[]
+  withdrawals Withdrawal[]
+  adminAdjustments AdminAdjustment[]
+  invitedBy   User?    @relation("user_inviter", fields: [invitedByTgUserId], references: [tgUserId], onDelete: SetNull)
+  invitedUsers User[]  @relation("user_inviter")
+  referralRewards ReferralReward[] @relation("reward_inviter")
+  referralEarnings ReferralReward[] @relation("reward_invitee")
+  ownedRooms  Room[]   @relation("room_owner")
+  betaWhitelist BetaWhitelist?
+}
+
+model Session {
+  token      String   @id
+  tgUserId   String
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime
+  user       User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model Balance {
+  tgUserId            String   @id
+  availableNanotons   String   @default("0")
+  lockedNanotons      String   @default("0")
+  serviceRevenueNano  String   @default("0")
+  updatedAt           DateTime @updatedAt
+  user                User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model Room {
+  roomId         String   @id
+  scope          String
+  code           String?  @unique
+  ownerTgUserId  String?
+  createdAt      DateTime @default(now())
+  isActive       Boolean  @default(true)
+  owner          User?    @relation("room_owner", fields: [ownerTgUserId], references: [tgUserId], onDelete: SetNull)
+  pools          Pool[]
+}
+
+model Pool {
+  poolId             String   @id
+  scope              String
+  roomId             String?
+  stakeNanotons      String
+  status             String
+  countdownEndsAt    DateTime?
+  createdAt          DateTime @default(now())
+  room               Room?    @relation(fields: [roomId], references: [roomId], onDelete: Cascade)
+  queueEntries       QueueEntry[]
+  matches            Match[]
+
+  @@unique([scope, roomId, stakeNanotons])
+}
+
+model QueueEntry {
+  id          String   @id
+  poolId      String
+  tgUserId    String
+  status      String
+  stakeNanotons String   @default("0")
+  createdAt   DateTime @default(now())
+  pool        Pool     @relation(fields: [poolId], references: [poolId], onDelete: Cascade)
+  user        User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model Match {
+  matchId         String   @id
+  poolId          String
+  stakeNanotons   String
+  potNanotons     String
+  feeNanotons     String
+  winnerTgUserId  String?
+  status          String
+  startedAt       DateTime
+  endedAt         DateTime?
+  pool            Pool     @relation(fields: [poolId], references: [poolId], onDelete: Cascade)
+  players         MatchPlayer[]
+  rounds          Round[]
+  votes           Vote[]
+}
+
+model MatchPlayer {
+  id            String   @id
+  matchId       String
+  tgUserId      String
+  status        String
+  stakeNanotons String   @default("0")
+  eliminatedAt  DateTime?
+  match         Match    @relation(fields: [matchId], references: [matchId], onDelete: Cascade)
+  user          User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model Round {
+  id           String   @id
+  matchId      String
+  roundId      Int
+  questionId   String
+  voteEndsAt   DateTime
+  resultJson   String?
+  match        Match    @relation(fields: [matchId], references: [matchId], onDelete: Cascade)
+}
+
+model Vote {
+  id          String   @id
+  matchId     String
+  roundId     Int
+  tgUserId    String
+  optionId    String
+  votedAt     DateTime @default(now())
+  match       Match    @relation(fields: [matchId], references: [matchId], onDelete: Cascade)
+  user        User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+
+  @@unique([matchId, roundId, tgUserId])
+}
+
+model Deposit {
+  depositId        String   @id
+  tgUserId         String
+  address          String
+  payload          String
+  amountNanotons   String?
+  txHash           String?
+  status           String
+  createdAt        DateTime @default(now())
+  confirmedAt      DateTime?
+  user             User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model Withdrawal {
+  id              String   @id
+  tgUserId        String
+  toAddress       String
+  amountNanotons  String
+  status          String
+  txHash          String?
+  createdAt       DateTime @default(now())
+  processedAt     DateTime?
+  user            User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model ReferralReward {
+  id               String   @id
+  inviterTgUserId  String
+  inviteeTgUserId  String
+  depositId        String   @unique
+  amountNanotons   String
+  createdAt        DateTime @default(now())
+  inviter          User     @relation("reward_inviter", fields: [inviterTgUserId], references: [tgUserId], onDelete: Cascade)
+  invitee          User     @relation("reward_invitee", fields: [inviteeTgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model AdminAdjustment {
+  id              String   @id
+  tgUserId        String
+  adminTgUserId   String
+  amountNanotons  String
+  reason          String?
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model BetaWhitelist {
+  tgUserId  String   @id
+  createdAt DateTime @default(now())
+  codeUsed  String?
+  user      User     @relation(fields: [tgUserId], references: [tgUserId], onDelete: Cascade)
+}
+
+model BetaCodesUsed {
+  code     String   @id
+  tgUserId String
+  usedAt   DateTime @default(now())
+}
+
+model Question {
+  id         String   @id
+  lang       String
+  text       String
+  optionsJson String
+  tags       String?
+  weight     Int      @default(1)
+  isActive   Boolean  @default(true)
+}

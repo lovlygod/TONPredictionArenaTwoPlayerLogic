@@ -1,0 +1,17 @@
+{
+  "name": "ton-prediction-arena",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "pnpm@10.6.2",
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "db:migrate": "pnpm --filter @arena/server db:migrate",
+    "db:seed": "pnpm --filter @arena/server db:seed",
+    "balance": "pnpm --filter @arena/server balance"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
